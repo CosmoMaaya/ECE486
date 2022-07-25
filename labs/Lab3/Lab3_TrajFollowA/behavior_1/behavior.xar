@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ChoregrapheProject xmlns="http://www.ald.softbankrobotics.com/schema/choregraphe/project.xsd" xar_version="3">
+  <Box name="root" id="-1" localization="8" tooltip="Root box of Choregraphe&apos;s behavior. Highest level possible." x="0" y="0">
+    <bitmap>media/images/box/root.png</bitmap>
+    <script language="4">
+      <content>
+        <![CDATA[]]>
+      </content>
+    </script>
+    <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+    <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+    <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+    <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+    <Timeline enable="0">
+      <BehaviorLayer name="behavior_layer1">
+        <BehaviorKeyframe name="keyframe1" index="1">
+          <Diagram scale="141.421">
+            <Box name="Stand Up" id="1" localization="8" tooltip="the robot tries to stand up from any position for a number of tries.&#x0A;&#x0A;Note: The number of tries can be set in parameters." x="136" y="98">
+              <bitmap>media/images/box/movement/stand.png</bitmap>
+              <script language="4">
+                <content>
+                  <![CDATA[]]>
+                </content>
+              </script>
+              <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+              <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+              <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+              <Output name="success" type="1" type_size="1" nature="1" inner="0" tooltip="Stimulated when the robot succeed in standing up." id="4" />
+              <Output name="failure" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when the robot failed to stand up after n tries.&#x0A;&#x0A;Note: The number of tries can be set in parameters." id="5" />
+              <Parameter name="Maximum of tries" inherits_from_parent="0" content_type="1" value="3" default_value="3" min="0" max="10" tooltip="The maximum number of fails of stand up before stimulating the failure output." id="6" />
+              <Timeline enable="0">
+                <BehaviorLayer name="StandUpBehavior">
+                  <BehaviorKeyframe name="DetectRobotPose" index="1">
+                    <Diagram>
+                      <Box name="Goto Posture" id="2" localization="8" tooltip="The robot goes from its current postition to the asked posture." x="331" y="92">
+                        <bitmap>media/images/box/box-diagram.png</bitmap>
+                        <script language="4">
+                          <content>
+                            <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.nTries = 0
+        self.postureService = self.session().service("ALRobotPosture")
+        pass
+
+    def onUnload(self):
+        self.postureService.stopMove()
+
+    def onInput_onStart(self):
+        if(self.nTries != self.getParameter("Maximum of tries")):
+            self.nTries = self.getParameter("Maximum of tries")
+            self.postureService.setMaxTryNumber(self.nTries)
+
+        result = self.postureService.goToPosture(self.getParameter("Name"), self.getParameter("Speed (%)")/100.)
+        if(result):
+            self.success()
+        else:
+            self.failure()
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #~ it is recommanded to call onUnload of this box in a onStop method, as the code written in onUnload is used to stop the box as well
+        pass]]>
+                          </content>
+                        </script>
+                        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                        <Output name="success" type="1" type_size="1" nature="1" inner="0" tooltip="Stimulated if the posture has been reached." id="4" />
+                        <Output name="failure" type="1" type_size="1" nature="1" inner="0" tooltip="Stimulated if the posture could not be reached." id="5" />
+                        <Parameter name="Name" inherits_from_parent="0" content_type="3" value="Stand" default_value="Stand" custom_choice="1" tooltip="Name of the posture to go to." id="6">
+                          <Choice value="Crouch" />
+                          <Choice value="LyingBack" />
+                          <Choice value="LyingBelly" />
+                          <Choice value="Sit" />
+                          <Choice value="SitRelax" />
+                          <Choice value="StandInit" />
+                          <Choice value="Stand" />
+                          <Choice value="StandZero" />
+                        </Parameter>
+                        <Parameter name="Speed (%)" inherits_from_parent="0" content_type="1" value="80" default_value="80" min="0" max="100" tooltip="Speed to go to the posture." id="7" />
+                        <Parameter name="Maximum of tries" inherits_from_parent="1" content_type="1" value="3" default_value="3" min="0" max="10" tooltip="The maximum number of fails of go to posture before stimulating the failure output." id="8" />
+                        <Resource name="All motors" type="Lock" timeout="0" />
+                        <Resource name="Stiffness" type="Lock" timeout="0" />
+                      </Box>
+                      <Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="2" />
+                      <Link inputowner="0" indexofinput="4" outputowner="2" indexofoutput="4" />
+                      <Link inputowner="0" indexofinput="5" outputowner="2" indexofoutput="5" />
+                    </Diagram>
+                  </BehaviorKeyframe>
+                </BehaviorLayer>
+              </Timeline>
+              <Resource name="All motors" type="Lock" timeout="0" />
+            </Box>
+            <Box name="RArmEndEffectorTransform" id="2" localization="8" tooltip="" x="562" y="318">
+              <bitmap>media/images/box/box-python-script.png</bitmap>
+              <script language="4">
+                <content>
+                  <![CDATA[import math
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self):
+        #self.onStopped() #activate the output of the box
+        self.motion_service = self.session().service("ALMotion")
+
+        angles = [-90,90,0,0,7]
+#        angles = [0, math.pi / 2, -math.pi/2]
+        names = ["RWristYaw", "RElbowYaw", "RShoulderPitch", "RShoulderRoll", "RElbowRoll"]
+        for name, angle in zip(names, angles):
+            self.motion_service.setAngles(name, angle / 180.0 * math.pi, 0.2)
+        time.sleep(2.0)
+
+        name = "RArm"
+        frame = motion.FRAME_TORSO
+        useSensorValues = False
+        result = self.motion_service.getTransform(name, frame, useSensorValues)
+
+        for i in range(0,4):
+            print("{0},  {1},  {2},  {3}".format(result[4*i + 0],result[4*i + 1],result[4*i + 2],result[4*i + 3]))
+            time.sleep(0.5)
+#        print("{0},  {1},  {2},  {3}".format(result[4*1 + 0],result[4*1 + 1],result[4*1 + 3],result[4*1 + 3]))
+#        time.sleep(1.0)
+#        print("{0},  {1},  {2},  {3}".format(result[4*2 + 0],result[4*2 + 1],result[4*2 + 3],result[4*2 + 3]))
+#        time.sleep(1.0)
+#        print("{0},  {1},  {2},  {3}".format(result[4*3 + 0],result[4*3 + 1],result[4*3 + 3],result[4*3 + 3]))
+        self.onStopped()
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+                </content>
+              </script>
+              <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+              <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+              <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+              <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+              <Parameter name="RShoulderPitch" inherits_from_parent="0" content_type="2" value="30" default_value="0" min="-119.5" max="119.5" tooltip="" id="5" />
+              <Parameter name="RShoulderRoll" inherits_from_parent="0" content_type="2" value="-30" default_value="0" min="-76" max="18" tooltip="" id="6" />
+              <Parameter name="RElbowRoll" inherits_from_parent="0" content_type="2" value="30" default_value="2" min="2" max="88.5" tooltip="" id="7" />
+            </Box>
+            <Box name="Initialization" id="3" localization="8" tooltip="" x="496" y="124">
+              <bitmap>media/images/box/box-python-script.png</bitmap>
+              <script language="4">
+                <content>
+                  <![CDATA[
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #put initialization code here
+        self.rxdesired = 2.0
+        self.rxactual = 2.0
+        self.rydesired = 2.0
+        self.ryactual = 2.0
+        self.rzdesired = 2.0
+        self.rzactual = 2.0
+        self.loop = 0
+        self.xyz = [[0.21935270905893567, 0.21935021947631467, 0.21933340578424465, 0.21928959603819614, 0.21920785066074014, 0.2190788854474542, 0.2188949945728297, 0.21864997359617797, 0.21833904246753735, 0.2179587685335796, 0.2175069895435167, 0.2169827366550074, 0.21638615744006395, 0.21571843889095868, 0.21498173042613075, 0.21417906689609287, 0.21331429158933768, 0.21239197923824463, 0.21141735902498657, 0.21039623758743656, 0.2093349220250742, 0.20824014290489262, 0.20711897726730494, 0.20597877163205097, 0.20482706500410386, 0.2036715118795768, 0.2025198052516297, 0.2013795996163757, 0.20025843397878798, 0.19916365485860643, 0.1981023392962441, 0.19708121785869404, 0.19610659764543603, 0.19518428529434295, 0.19431950998758776, 0.19351684645754985, 0.19278013799272198, 0.19211241944361668, 0.1915158402286732, 0.1909915873401639, 0.190539808350101, 0.19015953441614328, 0.1898486032875026, 0.18960358231085095, 0.1894196914362264, 0.1892907262229405, 0.18920898084548443, 0.18916517109943598, 0.189148357407366, 0.18914586782474496, 0.18914586782474496, 0.18914455744170897, 0.18913570761416146, 0.18911264850877196, 0.18906962211752618, 0.18900174173215606, 0.1889049514185706, 0.18877598549128596, 0.18861232798785604, 0.18841217214330258, 0.18817437986454602, 0.18789844120483545, 0.18758443383817935, 0.18723298253377568, 0.18684521863044257, 0.18642273951104854, 0.18596756807694287, 0.1854821122223862, 0.18496912430898063, 0.18443166064010041, 0.18387304093532217, 0.18329680780485533, 0.18270668622397257, 0.1821065430074401, 0.1815003462839483, 0.18089212497054166, 0.1802859282470498, 0.17968578503051735, 0.1790956634496346, 0.17851943031916775, 0.1779608106143895, 0.17742334694550932, 0.17691035903210373, 0.17642490317754705, 0.17596973174344138, 0.17554725262404733, 0.17515948872071424, 0.1748080374163106, 0.17449403004965444, 0.1742180913899439, 0.17398029911118731, 0.17378014326663388, 0.17361648576320393, 0.1734875198359193, 0.17339072952233386, 0.17332284913696377, 0.17327982274571793, 0.17325676364032846, 0.17324791381278098, 0.17324660342974496, 0.17324660342974496, 0.17324401865447042, 0.17322656206750295, 0.17318107719489237, 0.173096206169254, 0.1729623097916988, 0.1727713875937639, 0.1725169978993432, 0.17219417788661745, 0.17179936364998502, 0.17133031026199216, 0.1707860118352634, 0.1701666215844322, 0.16947337188807093, 0.16870849435062188, 0.16787513986432723, 0.16697729867115968, 0.16601972042475294, 0.16500783425233187, 0.1639476688166433, 0.1628457723778862, 0.16170913285564215, 0.1605450978908058, 0.15936129490751527, 0.15816555117508274, 0.15696581386992453, 0.155770070137492, 0.15458626715420148, 0.15342223218936513, 0.15228559266712108, 0.15118369622836397, 0.15012353079267537, 0.14911164462025436, 0.14815406637384756, 0.14725622518068007, 0.1464228706943854, 0.14565799315693637, 0.14496474346057509, 0.14434535320974382, 0.14380105478301505, 0.14333200139502225, 0.14293718715838982, 0.14261436714566406, 0.14235997745124337, 0.1421690552533085, 0.14203515887575327, 0.14195028785011485, 0.14190480297750435, 0.1418873463905369, 0.1418847616152623, 0.1418847616152623, 0.1418848578481676, 0.14188550776852887, 0.14188720120063533, 0.14189036100545563, 0.1418953460567854, 0.14190245421739495, 0.14191192531517668, 0.14192394411929296, 0.1419386433163233, 0.14195610648641227, 0.1419763710794169, 0.14199943139105436, 0.14202524153904944, 0.14205371843928216, 0.1420847447819355, 0.14211817200764273, 0.14215382328363513, 0.14219149647988957, 0.14223096714527608, 0.14227199148370542, 0.14231430933027667, 0.1423576471274247, 0.14240172090106806, 0.14244623923675614, 0.14249090625581703, 0.1425354245915051, 0.14257949836514844, 0.14262283616229648, 0.14266515400886773, 0.14270617834729707, 0.14274564901268358, 0.14278332220893802, 0.14281897348493042, 0.14285240071063765, 0.14288342705329096, 0.14291190395352374, 0.1429377141015188, 0.14296077441315624, 0.14298103900616088, 0.14299850217624988, 0.14301320137328022, 0.14302522017739647, 0.14303469127517823, 0.14304179943578776, 0.14304678448711752, 0.1430499442919378, 0.14305163772404425, 0.14305228764440556, 0.14305238387731084], [-0.113, -0.113, -0.113, -0.11299999999999999, -0.113, -0.113, -0.113, -0.113, -0.11300000000000002, -0.113, -0.113, -0.11299999999999999, -0.11300000000000002, -0.113, -0.11299999999999999, -0.113, -0.113, -0.11300000000000002, -0.113, -0.113, -0.11299999999999999, -0.11300000000000002, -0.113, -0.11299999999999999, -0.11300000000000002, -0.113, -0.11299999999999999, -0.11300000000000002, -0.11299999999999999, -0.11299999999999999, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.113, -0.11300610868129196, -0.11304736438629674, -0.11315486022669756, -0.11335543861030198, -0.11367188016121413, -0.11412309264000692, -0.11472429986389439, -0.11548723062690387, -0.11642030762004829, -0.11752883635149844, -0.11881519406675511, -0.12027901866882154, -0.12191739763837546, -0.1237250569539415, -0.12569455001206337, -0.12781644654747615, -0.13007952155327848, -0.1324709442011049, -0.134976466761298, -0.1375806135230807, -0.14026686971472874, -0.14301787042374248, -0.1458155895170195, -0.14864152856102675, -0.15147690574197278, -0.15430284478598, -0.15710056387925705, -0.15985156458827077, -0.1625378207799188, -0.16514196754170157, -0.16764749010189467, -0.17003891274972105, -0.17230198775552336, -0.17442388429093614, -0.17639337734905802, -0.178201036664624, -0.179839415634178, -0.18130324023624445, -0.18258959795150118, -0.18369812668295127, -0.18463120367609567, -0.1853941344391052, -0.18599534166299259, -0.1864465541417854, -0.18676299569269753, -0.186963574076302, -0.1870710699167028, -0.18711232562170743, -0.18711843430299951, -0.18711843430299951, -0.1871210633172378, -0.18713881867730398, -0.18718508203292256, -0.18727140564372918, -0.18740759368549673, -0.18760178355636148, -0.18786052718304935, -0.188188872327102, -0.188590443891103, -0.18906752522490414, -0.18962113943185138, -0.19025113067501132, -0.19095624548339699, -0.1917342140581944, -0.19258183157898856, -0.19349503950998953, -0.1944690069062588, -0.19549821171993534, -0.19657652210646184, -0.19769727773081083, -0.1988533710737109, -0.20003732873787283, -0.20124139275421585, -0.20245760188809367, -0.20367787294552078, -0.20489408207939858, -0.20609814609574162, -0.20728210375990358, -0.20843819710280362, -0.20955895272715264, -0.21063726311367914, -0.21166646792735566, -0.21264043532362492, -0.2135536432546259, -0.21440126077542004, -0.21517922935021747, -0.21588434415860316, -0.2165143354017631, -0.21706794960871037, -0.21754503094251146, -0.2179466025065125, -0.21827494765056513, -0.21853369127725294, -0.2187278811481177, -0.21886406918988527, -0.21895039280069195, -0.21899665615631048, -0.2190144115163766, -0.21901704053061494, -0.21901704053061494, -0.2190141372241771, -0.2189945293991469, -0.2189434392619207, -0.2188481092742231, -0.218697712363981, -0.218483262136198, -0.21819752308382867, -0.217834920798653, -0.21739145218215047, -0.21686459565637461, -0.21625322137482708, -0.21555750143333213, -0.21477882008091084, -0.21391968393065547, -0.21298363217060373, -0.21197514677461315, -0.21089956271323523, -0.20976297816458994, -0.20857216472523996, -0.20733447762106488, -0.20605776591813574, -0.204750282733589, -0.20342059544650123, -0.20207749590876317, -0.20072991065595402, -0.19938681111821593, -0.19805712383112817, -0.19674964064658143, -0.19547292894365226, -0.1942352418394772, -0.1930444284001272, -0.19190784385148196, -0.19083225979010404, -0.18982377439411344, -0.18888772263406167, -0.18802858648380635, -0.18724990513138506, -0.18655418518989006, -0.1859428109083425, -0.18541595438256667, -0.18497248576606415, -0.18460988348088844, -0.1843241444285192, -0.18410969420073617, -0.18395929729049407, -0.18386396730279642, -0.1838128771655703, -0.18379326934054013, -0.18379036603410223], [0.1016383012184606, 0.10164732241679499, 0.10170824815174254, 0.10186699621045264, 0.10216320701170489, 0.10263052260005885, 0.10329686564000387, 0.10418471841010876, 0.10531140179717166, 0.10668935429036974, 0.10832641097540902, 0.11022608252867402, 0.11238783421137774, 0.11480736486371124, 0.11747688589899347, 0.12038540029782108, 0.12351898160221811, 0.12686105290978583, 0.13039266586785248, 0.134092779667623, 0.1379385400383289, 0.14190555824137785, 0.14596819006450373, 0.15009981481591606, 0.15427311431845003, 0.15846035190371624, 0.1626336514062502, 0.16676527615766257, 0.17082790798078842, 0.17479492618383738, 0.1786406865545433, 0.1823408003543138, 0.18587241331238044, 0.18921448461994816, 0.19234806592434517, 0.1952565803231728, 0.19792610135845495, 0.2003456320107886, 0.20250738369349233, 0.20440705524675742, 0.2060441119317966, 0.20742206442499467, 0.20854874781205762, 0.20943660058216237, 0.2101029436221074, 0.21057025921046138, 0.21086647001171377, 0.21102521807042376, 0.2110861438053711, 0.21109516500370568, 0.21109516500370568, 0.2110944084537071, 0.21108929900339027, 0.21107598582268636, 0.21105114452411836, 0.21101195376535223, 0.2109560718517487, 0.21088161333891464, 0.21078712563525448, 0.21067156560452166, 0.21053427616837034, 0.21037496290890662, 0.2101936706712402, 0.2099907601660357, 0.2097668845720643, 0.20952296613875515, 0.20926017278874684, 0.20897989472043885, 0.2086837210105431, 0.20837341621663547, 0.20805089697970713, 0.20771820862671614, 0.20737750177313885, 0.2070310089255215, 0.20668102108403164, 0.20632986434500947, 0.20597987650351957, 0.20563338365590222, 0.205292676802325, 0.20495998844933397, 0.2046374692124056, 0.20432716441849796, 0.20403099070860226, 0.20375071264029426, 0.20348791929028595, 0.2032440008569768, 0.20302012526300542, 0.2028172147578009, 0.20263592252013446, 0.20247660926067074, 0.20233931982451944, 0.20222375979378665, 0.20212927209012643, 0.20205481357729238, 0.20199893166368887, 0.20195974090492275, 0.20193489960635472, 0.20192158642565083, 0.20191647697533402, 0.20191572042533543, 0.20191572042533543, 0.20191667218566658, 0.20192310001216146, 0.20193984835305007, 0.2019710993775638, 0.2020204024105577, 0.20209070336713267, 0.2021843741872575, 0.202303242270391, 0.20244861991010443, 0.20262133372870333, 0.20282175411184983, 0.20304982464318477, 0.20330509153894993, 0.2035867330826101, 0.2038935890594753, 0.20422419019132282, 0.20457678757101952, 0.20494938209714392, 0.20533975390860842, 0.2057454918192813, 0.20616402275260906, 0.20659264117623843, 0.20702853853663863, 0.20746883269372351, 0.20791059735547363, 0.20835089151255848, 0.2087867888729587, 0.20921540729658805, 0.2096339382299158, 0.2100396761405887, 0.21043004795205317, 0.2108026424781776, 0.2111552398578743, 0.2114858409897218, 0.21179269696658698, 0.21207433851024715, 0.21232960540601234, 0.21255767593734728, 0.2127580963204938, 0.21293081013909268, 0.2130761877788061, 0.21319505586193965, 0.21328872668206444, 0.2133590276386394, 0.2134083306716333, 0.21343958169614705, 0.21345633003703565, 0.2134627578635305, 0.21346370962386169, 0.21346370962386169, 0.21346556092210162, 0.2134780638847564, 0.21351064159680658, 0.21357142892402026, 0.21366732976714023, 0.21380407431607115, 0.2139862763040668, 0.2142174902619174, 0.21450026877213663, 0.21483621972314904, 0.21522606356347723, 0.215669690555929, 0.21616621803178465, 0.21671404764498414, 0.21731092262631446, 0.2179539850375966, 0.21863983302587311, 0.2193645780775949, 0.22012390227280887, 0.22091311553934492, 0.22172721290700323, 0.22256093176174144, 0.22340880909986194, 0.22426523878219903, 0.2251245287883062, 0.22598095847064326, 0.22682883580876376, 0.22766255466350196, 0.22847665203116027, 0.22926586529769633, 0.2300251894929103, 0.2307499345446321, 0.23143578253290856, 0.23207884494419073, 0.23267571992552102, 0.23322354953872054, 0.2337200770145762, 0.23416370400702796, 0.23455354784735616, 0.23488949879836857, 0.2351722773085878, 0.2354034912664384, 0.23558569325443404, 0.23572243780336496, 0.23581833864648494, 0.23587912597369864, 0.2359117036857488, 0.23592420664840355, 0.2359260579466435]]
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+
+
+    def ik(self, px, py, pz):
+        # constants
+        L1 = 15
+        L2 = 105
+        L3 = (55.95+57.75)
+        L4 = 12.31
+
+        # swtich to r1 home frame
+        x_e = px * 1000
+        y_e = py * 1000 + 98
+        z_e = pz * 1000 - 100
+
+        print(x_e, y_e, z_e)
+
+        # theta3
+        d = math.sqrt(x_e**2 + y_e**2 + z_e**2 - L1**2)
+        print(L3**2 + L4**2 + L2**2)
+        print(d)
+        beta = math.acos((L3**2 + L4**2 + L2**2 - d**2)/(2 * L2 * math.sqrt(L3**2 + L4**2)))
+        eta = math.atan(L4 / L3)
+        delta = math.pi - beta
+        # How do we tell the difference?
+
+        theta3_elbow_down = math.pi - beta + eta
+        theta3_elbow_up = math.pi + beta + eta
+        theta3_elbow_up = theta3_elbow_up - 2 * math.pi if theta3_elbow_up >= 2 * math.pi - 1e-5 else theta3_elbow_up
+
+        # theta2
+        EB = math.sqrt(x_e**2 + z_e**2)
+        EC = math.sqrt(L3**2+L4**2) * math.sin(delta)
+        d = math.sqrt(EB**2 - EC**2)
+        m = math.sqrt(x_e**2 + y_e**2 + z_e**2 - EC**2)
+        phi = math.acos(abs(y_e)/m)
+        alpha = math.acos(L1 / m)
+        theta2 = -(alpha - phi) # direction of theta2 is opposite
+
+        # theta1
+        CK = math.sqrt(m**2 - L1**2)
+        DK = L1 * math.tan(theta2)  # When theta2 is negative, DK will be negative, too
+        DC = CK + DK
+
+        BO = DC*math.cos(theta2)
+        AO = math.sqrt(x_e**2 + z_e**2)
+
+        epsilon = math.acos(BO/AO)
+        gamma = math.atan(-z_e/x_e)
+
+        theta1_elbow_up = -epsilon + gamma
+        theta1_elbow_down = epsilon + gamma # direction of theta1 is opposite
+
+        return [theta1_elbow_down, theta2, theta3_elbow_down]
+
+
+    def plot_xyz(self):
+        # ****** COPY/PASTE BEGIN ****** paste following code into your own script
+        # Realtime plot X, Y, Z in debug window for simulation and real NAO
+        # ie. plots uppercase X for desired and lowercase x for actual in millimeters
+        line = "%03s" % str(self.loop) #<<<< INITIALIZE self.loop by placing self.loop = 0 in your onLoad(self):
+        xmin = 0.0 # range settings
+        xmax = 250.0
+        ymin = -250.0
+        ymax = 0.0
+        zmin = 0.0
+        zmax = 250.0
+        screenwidth = 100 # in characters
+        xdesired = self.rxdesired # <<<< CHANGE  to match your xdesired variable name
+        xactual = self.rxactual # <<<< CHANGE  to match your xactual variable name
+        ydesired = self.rydesired # <<<< CHANGE  to match your ydesired variable name
+        yactual = self.ryactual # <<<< CHANGE  to match your yactual variable name
+        zdesired = self.rzdesired # <<<< CHANGE  to match your zdesired variable name
+        zactual = self.rzactual # <<<< CHANGE  to match your zactual variable name
+        temp = str(xdesired)+','+str(ydesired)+','+str(zdesired)+','+str(xactual)+','+str(yactual)+','+str(zactual)
+#        self.logger.warning(temp)
+        for i in range(0,screenwidth):
+            symbol = " "
+            if (i == int((xdesired-xmin)/(xmax-xmin)*screenwidth)): symbol = "X"
+            if (i == int((xactual-xmin)/(xmax-xmin)*screenwidth)): symbol = "x"
+            if (i == int((ydesired-ymin)/(ymax-ymin)*screenwidth)): symbol = "Y"
+            if (i == int((yactual-ymin)/(ymax-ymin)*screenwidth)): symbol = "y"
+            if (i == int((zdesired-zmin)/(zmax-zmin)*screenwidth)): symbol = "Z"
+            if (i == int((zactual-zmin)/(zmax-zmin)*screenwidth)): symbol = "z"
+            line += symbol # display in debug window
+        self.logger.warning(line)
+        self.loop += 1
+        # ****** COPY/PASTE END ****** PlotXYZ
+
+    def move_to_angle(self, thetas):
+        self.motion_service = self.session().service("ALMotion")
+        names = ["RShoulderPitch", "RShoulderRoll", "RElbowRoll"]
+        for angle, name in zip(thetas, names):
+            self.motion_service.setAngles(name, angle, 1)
+
+        time.sleep(0.1)
+
+        name = "RArm"
+        frame = motion.FRAME_TORSO
+        useSensorValues = False
+
+        xyz_actual = self.motion_service.getPosition(name, frame, useSensorValues)
+        self.rxactual = xyz_actual[0]*1000
+        self.ryactual = xyz_actual[1]*1000
+        self.rzactual = xyz_actual[2]*1000
+#        self.logger.info(thetas)
+        self.plot_xyz()
+
+    def loop_through_traj(self):
+        for i in range(200):
+            self.rxdesired = self.xyz[0][i]*1000
+            self.rydesired = self.xyz[1][i]*1000
+            self.rzdesired = self.xyz[2][i]*1000
+            theta = self.ik(self.xyz[0][i],self.xyz[1][i],self.xyz[2][i])
+            self.move_to_angle(theta)
+
+    def onInput_onStart(self):
+        #self.onStopped() #activate the output of the box
+        self.loop_through_traj()
+
+        time.sleep(5.0)
+        self.onStopped()
+
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+                </content>
+              </script>
+              <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+              <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+              <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+              <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+            </Box>
+            <Box name="RArmEndEffectorTransform (1)" id="4" localization="8" tooltip="" x="319" y="99">
+              <bitmap>media/images/box/box-python-script.png</bitmap>
+              <script language="4">
+                <content>
+                  <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self):
+        #self.onStopped() #activate the output of the box
+        self.motion_service = self.session().service("ALMotion")
+        angles = [-90,90,0,0,7]
+#        angles = [0, math.pi / 2, -math.pi/2]
+        names = ["RWristYaw", "RElbowYaw", "RShoulderPitch", "RShoulderRoll", "RElbowRoll"]
+        for angle, name in zip(angles, names):
+            self.motion_service.setAngles(name, angle*math.pi/180, 0.2)
+            print(name, angle)
+        time.sleep(5.0)
+        self.onStopped()
+
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+                </content>
+              </script>
+              <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+              <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+              <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+              <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+              <Parameter name="RShoulderPitch" inherits_from_parent="0" content_type="2" value="30" default_value="0" min="-119.5" max="119.5" tooltip="" id="5" />
+              <Parameter name="RShoulderRoll" inherits_from_parent="0" content_type="2" value="-30" default_value="0" min="-76" max="18" tooltip="" id="6" />
+              <Parameter name="RElbowRoll" inherits_from_parent="0" content_type="2" value="30" default_value="2" min="2" max="88.5" tooltip="" id="7" />
+            </Box>
+            <Link inputowner="0" indexofinput="4" outputowner="2" indexofoutput="4" />
+            <Link inputowner="2" indexofinput="2" outputowner="3" indexofoutput="4" />
+            <Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="2" />
+            <Link inputowner="4" indexofinput="2" outputowner="1" indexofoutput="4" />
+            <Link inputowner="3" indexofinput="2" outputowner="4" indexofoutput="4" />
+          </Diagram>
+        </BehaviorKeyframe>
+      </BehaviorLayer>
+    </Timeline>
+  </Box>
+</ChoregrapheProject>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ChoregrapheProject xmlns="http://www.aldebaran-robotics.com/schema/choregraphe/project.xsd" xar_version="3">
+    <Box name="root" robot="" id="-1" tooltip="Root box of Choregraphe&apos;s project. Highest level possible." bitmap_expanded="1" plugin="" x="0" y="0">
+        <bitmap>media/images/box/root.png</bitmap>
+        <script language="4">
+            <content>
+                <![CDATA[]]>
+</content>
+        </script>
+        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+        <Timeline fps="10" resources_acquisition="0" size="300" enable="0" start_frame="0" end_frame="-1" scale="10">
+            <watches />
+            <BehaviorLayer name="behavior_layer1" mute="0">
+                <BehaviorKeyframe name="keyframe1" index="1" bitmap="">
+                    <Diagram scale="80">
+                        <Box name="Plot_XYZ" robot="" id="7" tooltip="Realtime plot of desired and actual X, Y, Z in debug window. Works for simulation and real NAO.&#x0A;Plots values in millimeters. Uppercase for desired and lowercase for actual." bitmap_expanded="1" plugin="" x="411" y="186">
+                            <bitmap>media/images/box/box-script.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        
+    def onLoad(self):
+         #~ puts code for box initialization here
+        self.rxdesired = 2.0
+        self.bxdesired = False
+        self.bxactual = False
+        self.rxactual = 2.0
+        self.rydesired = 2.0
+        self.bydesired = False
+        self.byactual = False
+        self.ryactual = 2.0
+        self.rzdesired = 2.0
+        self.bzdesired = False
+        self.bzactual = False
+        self.rzactual = 2.0
+        self.loop = 0
+        pass
+
+    def onUnload(self):
+        #puts code for box cleanup here
+        pass
+
+    def onInput_xdesired(self, rVal ):
+        self.rxdesired = float(rVal)
+        self.bxdesired = True
+        self.process()
+        pass
+
+    def onInput_xactual(self, rVal ):
+        self.rxactual = float(rVal)
+        self.bxactual = True
+        self.process()
+        pass
+
+    def onInput_ydesired(self, rVal ):
+        self.rydesired = float(rVal)
+        self.bydesired = True
+        self.process()
+        pass
+
+    def onInput_yactual(self, rVal ):
+        self.ryactual = float(rVal)
+        self.byactual = True
+        self.process()
+        pass
+
+    def onInput_zdesired(self, rVal ):
+        self.rzdesired = float(rVal)
+        self.bzdesired = True
+        self.process()
+        pass
+
+    def onInput_zactual(self, rVal ):
+        self.rzactual = float(rVal)
+        self.bzactual = True
+        self.process()
+        pass
+
+    def process(self):
+        if self.bxdesired and self.bxactual and self.bydesired and self.byactual and self.bzdesired and self.bzactual:
+            self.bxdesired = False
+            self.bxactual = False
+            self.bydesired = False
+            self.byactual = False
+            self.bzdesired = False
+            self.bzactual = False
+            
+            # ****** COPY/PASTE BEGIN ****** paste following code into your own script
+            # Realtime plot X, Y, Z in debug window for simulation and real NAO
+            # ie. plots uppercase X for desired and lowercase x for actual in millimeters
+            line = "%03s" % str(self.loop) #<<<< INITIALIZE self.loop by placing self.loop = 0 in your onLoad(self):
+            xmin = 0.0 # range settings
+            xmax = 250.0
+            ymin = -250.0
+            ymax = 0.0
+            zmin = 0.0
+            zmax = 250.0
+            screenwidth = 100 # in characters
+            xdesired = self.rxdesired # <<<< CHANGE  to match your xdesired variable name
+            xactual = self.rxactual # <<<< CHANGE  to match your xactual variable name
+            ydesired = self.rydesired # <<<< CHANGE  to match your ydesired variable name
+            yactual = self.ryactual # <<<< CHANGE  to match your yactual variable name
+            zdesired = self.rzdesired # <<<< CHANGE  to match your zdesired variable name
+            zactual = self.rzactual # <<<< CHANGE  to match your zactual variable name
+            for i in range(0,screenwidth):
+                symbol = " "
+                if (i == int((xdesired-xmin)/(xmax-xmin)*screenwidth)): symbol = "X"
+                if (i == int((xactual-xmin)/(xmax-xmin)*screenwidth)): symbol = "x"
+                if (i == int((ydesired-ymin)/(ymax-ymin)*screenwidth)): symbol = "Y"
+                if (i == int((yactual-ymin)/(ymax-ymin)*screenwidth)): symbol = "y"
+                if (i == int((zdesired-zmin)/(zmax-zmin)*screenwidth)): symbol = "Z"
+                if (i == int((zactual-zmin)/(zmax-zmin)*screenwidth)): symbol = "z"
+                line += symbol # display in debug window
+            self.logger.warning(line)
+            self.loop += 1
+            # ****** COPY/PASTE END ****** PlotXYZ
+            
+            self.output_Plot()
+            pass]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="xdesired" type="2" type_size="1" nature="1" inner="0" tooltip="" id="2" />
+                            <Input name="xactual" type="2" type_size="1" nature="1" inner="0" tooltip="" id="3" />
+                            <Input name="ydesired" type="2" type_size="1" nature="1" inner="0" tooltip="" id="4" />
+                            <Input name="yactual" type="2" type_size="1" nature="1" inner="0" tooltip="" id="5" />
+                            <Input name="zdesired" type="2" type_size="1" nature="1" inner="0" tooltip="" id="6" />
+                            <Input name="zactual" type="2" type_size="1" nature="1" inner="0" tooltip="" id="7" />
+                            <Output name="output_Plot" type="1" type_size="1" nature="2" inner="0" tooltip="" id="8" />
+                        </Box>
+                    </Diagram>
+                </BehaviorKeyframe>
+            </BehaviorLayer>
+            <ActuatorList />
+        </Timeline>
+    </Box>
+</ChoregrapheProject>

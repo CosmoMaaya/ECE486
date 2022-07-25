@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ChoregrapheProject xmlns="http://www.aldebaran-robotics.com/schema/choregraphe/project.xsd" xar_version="3">
+    <Box name="root" robot="" id="-1" tooltip="Root box of Choregraphe&apos;s project. Highest level possible." bitmap_expanded="1" plugin="" x="0" y="0">
+        <bitmap>media/images/box/root.png</bitmap>
+        <script language="4">
+            <content>
+                <![CDATA[]]>
+</content>
+        </script>
+        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+        <Timeline fps="10" resources_acquisition="0" size="300" enable="0" start_frame="0" end_frame="-1" scale="10">
+            <watches />
+            <BehaviorLayer name="behavior_layer1" mute="0">
+                <BehaviorKeyframe name="keyframe1" index="1" bitmap="">
+                    <Diagram scale="80">
+                        <Box name="Plot_XYZ_demo" robot="" id="2" tooltip="A box which demonstrates the appearance of the graph output from the Plot_XYZ box." bitmap_expanded="1" plugin="" x="230" y="102">
+                            <bitmap>media/images/box/box-diagram.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="Wait_onStart" type="0" type_size="1" nature="2" inner="0" tooltip="This input has been automatically generated&#x0A;by converting several boxes into a single box." id="2" />
+                            <Timeline fps="10" resources_acquisition="0" size="300" enable="0" start_frame="0" end_frame="-1" scale="10">
+                                <watches />
+                                <BehaviorLayer name="behavior_layer1" mute="0">
+                                    <BehaviorKeyframe name="keyframe1" index="1" bitmap="">
+                                        <Diagram scale="-1">
+                                            <Box name="Wait" robot="" id="1" tooltip="Wait a moment before sending a signal on the output. The wait can be stopped any&#x0A;time. You may restart it any time, and it will start again." bitmap_expanded="1" plugin="" x="230" y="102">
+                                                <bitmap>media/images/box/wait.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[import threading
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.tb = False
+
+    def onUnload(self):
+        if( self.tb ):
+            self.tb.cancel()
+            self.tb = False
+
+    def triggerOutput( self, rPeriod = 1 ):
+        self.onUnload() # to clean everything
+        self.timerOutput()
+
+    def startTimer( self, rPeriod = 1 ):
+        if( self.tb ):
+            self.tb.cancel()
+        self.tb = threading.Timer( rPeriod, self.triggerOutput, [rPeriod] )
+        self.tb.start()
+
+    def onInput_onStart(self):
+        self.startTimer( self.getParameter("Timeout (s)") )
+
+    def onInput_onStop(self):
+        bRunning = self.tb
+        self.onUnload()
+        if( bRunning ):
+            self.timerOutput()]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the Wait box with the configured timeout value." id="2" />
+                                                <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stop the wait and stimulate the output." id="3" />
+                                                <Output name="timerOutput" type="1" type_size="1" nature="1" inner="0" tooltip="Send a bang once time set in parameters is ellapsed, or if the box is stopped." id="4" />
+                                                <Parameter name="Timeout (s)" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0" max="5000" tooltip="Duration the box waits before stimulating the output." id="5" />
+                                            </Box>
+                                            <Box name="Number Edit" robot="" id="3" tooltip="Send the number you entered when the input is stimulated." bitmap_expanded="1" plugin="numberedit_plugin" x="420" y="242">
+                                                <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped(40)]]>
+</content>
+                                                </script>
+                                                <pluginContent>
+                                                    <number>40</number>
+                                                </pluginContent>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the number on the output." id="2" />
+                                                <Output name="onStopped" type="2" type_size="1" nature="2" inner="0" tooltip="The number you entered." id="3" />
+                                            </Box>
+                                            <Box name="Plot_XYZ" robot="" id="7" tooltip="Realtime plot of desired and actual X, Y, Z in debug window. Works for simulation and real NAO.&#x0A;Plots values in millimeters. Uppercase for desired and lowercase for actual." bitmap_expanded="1" plugin="" x="620" y="297">
+                                                <bitmap>media/images/box/box-script.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        
+    def onLoad(self):
+         #~ puts code for box initialization here
+        self.rxdesired = 2.0
+        self.bxdesired = False
+        self.bxactual = False
+        self.rxactual = 2.0
+        self.rydesired = 2.0
+        self.bydesired = False
+        self.byactual = False
+        self.ryactual = 2.0
+        self.rzdesired = 2.0
+        self.bzdesired = False
+        self.bzactual = False
+        self.rzactual = 2.0
+        self.loop = 0
+        pass
+
+    def onUnload(self):
+        #puts code for box cleanup here
+        pass
+
+    def onInput_xdesired(self, rVal ):
+        self.rxdesired = float(rVal)
+        self.bxdesired = True
+        self.process()
+        pass
+
+    def onInput_xactual(self, rVal ):
+        self.rxactual = float(rVal)
+        self.bxactual = True
+        self.process()
+        pass
+
+    def onInput_ydesired(self, rVal ):
+        self.rydesired = float(rVal)
+        self.bydesired = True
+        self.process()
+        pass
+
+    def onInput_yactual(self, rVal ):
+        self.ryactual = float(rVal)
+        self.byactual = True
+        self.process()
+        pass
+
+    def onInput_zdesired(self, rVal ):
+        self.rzdesired = float(rVal)
+        self.bzdesired = True
+        self.process()
+        pass
+
+    def onInput_zactual(self, rVal ):
+        self.rzactual = float(rVal)
+        self.bzactual = True
+        self.process()
+        pass
+
+    def process(self):
+        if self.bxdesired and self.bxactual and self.bydesired and self.byactual and self.bzdesired and self.bzactual:
+            self.bxdesired = False
+            self.bxactual = False
+            self.bydesired = False
+            self.byactual = False
+            self.bzdesired = False
+            self.bzactual = False
+            
+            # ****** COPY/PASTE BEGIN ****** paste following code into your own script
+            # Realtime plot X, Y, Z in debug window for simulation and real NAO
+            # ie. plots uppercase X for desired and lowercase x for actual in millimeters
+            line = "%03s" % str(self.loop) #<<<< INITIALIZE self.loop by placing self.loop = 0 in your onLoad(self):
+            xmin = 0.0 # range settings
+            xmax = 250.0
+            ymin = -250.0
+            ymax = 0.0
+            zmin = 0.0
+            zmax = 250.0
+            screenwidth = 100 # in characters
+            xdesired = self.rxdesired # <<<< CHANGE  to match your xdesired variable name
+            xactual = self.rxactual # <<<< CHANGE  to match your xactual variable name
+            ydesired = self.rydesired # <<<< CHANGE  to match your ydesired variable name
+            yactual = self.ryactual # <<<< CHANGE  to match your yactual variable name
+            zdesired = self.rzdesired # <<<< CHANGE  to match your zdesired variable name
+            zactual = self.rzactual # <<<< CHANGE  to match your zactual variable name
+            for i in range(0,screenwidth):
+                symbol = " "
+                if (i == int((xdesired-xmin)/(xmax-xmin)*screenwidth)): symbol = "X"
+                if (i == int((xactual-xmin)/(xmax-xmin)*screenwidth)): symbol = "x"
+                if (i == int((ydesired-ymin)/(ymax-ymin)*screenwidth)): symbol = "Y"
+                if (i == int((yactual-ymin)/(ymax-ymin)*screenwidth)): symbol = "y"
+                if (i == int((zdesired-zmin)/(zmax-zmin)*screenwidth)): symbol = "Z"
+                if (i == int((zactual-zmin)/(zmax-zmin)*screenwidth)): symbol = "z"
+                line += symbol # display in debug window
+            self.logger.warning(line)
+            self.loop += 1
+            # ****** COPY/PASTE END ****** PlotXYZ
+            
+            self.output_Plot()
+            pass]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="xdesired" type="2" type_size="1" nature="1" inner="0" tooltip="" id="2" />
+                                                <Input name="xactual" type="2" type_size="1" nature="1" inner="0" tooltip="" id="3" />
+                                                <Input name="ydesired" type="2" type_size="1" nature="1" inner="0" tooltip="" id="4" />
+                                                <Input name="yactual" type="2" type_size="1" nature="1" inner="0" tooltip="" id="5" />
+                                                <Input name="zdesired" type="2" type_size="1" nature="1" inner="0" tooltip="" id="6" />
+                                                <Input name="zactual" type="2" type_size="1" nature="1" inner="0" tooltip="" id="7" />
+                                                <Output name="output_Plot" type="1" type_size="1" nature="2" inner="0" tooltip="" id="8" />
+                                            </Box>
+                                            <Box name="Number Edit" robot="" id="4" tooltip="Send the number you entered when the input is stimulated." bitmap_expanded="1" plugin="numberedit_plugin" x="187" y="454">
+                                                <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped(110)]]>
+</content>
+                                                </script>
+                                                <pluginContent>
+                                                    <number>110</number>
+                                                </pluginContent>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the number on the output." id="2" />
+                                                <Output name="onStopped" type="2" type_size="1" nature="2" inner="0" tooltip="The number you entered." id="3" />
+                                            </Box>
+                                            <Box name="Number Edit" robot="" id="5" tooltip="Send the number you entered when the input is stimulated." bitmap_expanded="1" plugin="numberedit_plugin" x="325" y="475">
+                                                <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped(100)]]>
+</content>
+                                                </script>
+                                                <pluginContent>
+                                                    <number>100</number>
+                                                </pluginContent>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the number on the output." id="2" />
+                                                <Output name="onStopped" type="2" type_size="1" nature="2" inner="0" tooltip="The number you entered." id="3" />
+                                            </Box>
+                                            <Box name="Number Edit" robot="" id="6" tooltip="Send the number you entered when the input is stimulated." bitmap_expanded="1" plugin="numberedit_plugin" x="340" y="319">
+                                                <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped(-180)]]>
+</content>
+                                                </script>
+                                                <pluginContent>
+                                                    <number>-180</number>
+                                                </pluginContent>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the number on the output." id="2" />
+                                                <Output name="onStopped" type="2" type_size="1" nature="2" inner="0" tooltip="The number you entered." id="3" />
+                                            </Box>
+                                            <Box name="Number Edit" robot="" id="8" tooltip="Send the number you entered when the input is stimulated." bitmap_expanded="1" plugin="numberedit_plugin" x="180" y="370">
+                                                <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped(-170)]]>
+</content>
+                                                </script>
+                                                <pluginContent>
+                                                    <number>-170</number>
+                                                </pluginContent>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the number on the output." id="2" />
+                                                <Output name="onStopped" type="2" type_size="1" nature="2" inner="0" tooltip="The number you entered." id="3" />
+                                            </Box>
+                                            <Box name="For" robot="" id="9" tooltip="Represent a counter.&#x0A;&#x0A;Each time the onStart input is stimulated, the counter value is sent on the&#x0A;currentValue output and incremented (or decremented) by Step value, from&#x0A;its Initial value to its Final value set in the parameters. Once the counter value is&#x0A;higher than its Final value, the onReinitialized output is stimulated and&#x0A;the counter is reinitialized to the Initial value.&#x0A;&#x0A;Note: You can also reinitialize the counter by stimulating the onInit&#x0A;input." bitmap_expanded="1" plugin="" x="433" y="87">
+                                                <bitmap>media/images/box/loop.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.initializeParameters()
+        if( self.getParameter("Final value") - self.getParameter("Initial value") >= 0 ):
+            self.stepSign = +1
+        else:
+            self.stepSign = -1
+
+    def onUnload(self):
+        #~ puts code for box cleanup here
+        pass
+
+    def onInput_onNext(self):
+        bParamChanged = ( self.nLast != self.getParameter("Final value") or self.nFirst != self.getParameter("Initial value") )
+        bEnd = ( self.stepSign * self.nCounter > self.stepSign * self.nLast )
+        if( bEnd or bParamChanged ):
+            self.onInput_onInit()
+        if( not bEnd or bParamChanged ):
+            currentCounter = self.nCounter
+            self.nCounter = self.nCounter + self.stepSign * self.getParameter("Step value")
+            self.currentValue( currentCounter )
+        
+    def initializeParameters(self):
+        self.nFirst = self.getParameter("Initial value")
+        self.nCounter = self.nFirst
+        self.nLast = self.getParameter("Final value")
+
+    def onInput_onInit(self):
+        self.initializeParameters()
+        self.onReinitialized()]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+                                                <Input name="onNext" type="1" type_size="1" nature="1" inner="0" tooltip="The counter next value is sent on the currentValue output when a signal is&#x0A;received on this input, unless it reached its Final value, then the onReinitialized&#x0A;output is stimulated." id="2" />
+                                                <Input name="onInit" type="1" type_size="1" nature="1" inner="0" tooltip="When a signal is received on this input, the counter is reinitialized to its Initial&#x0A;value." id="3" />
+                                                <Output name="currentValue" type="2" type_size="1" nature="2" inner="0" tooltip="Stimulated for each interaction with the counter current value." id="4" />
+                                                <Output name="onReinitialized" type="1" type_size="1" nature="2" inner="0" tooltip="Stimulated when the loop is over or if the counter has been reinitialized." id="5" />
+                                                <Parameter name="Initial value" inherits_from_parent="0" content_type="1" value="0" default_value="0" min="0" max="500" tooltip="The initial value of the counter (for the first iteration)." id="6" />
+                                                <Parameter name="Step value" inherits_from_parent="0" content_type="1" value="2" default_value="1" min="1" max="500" tooltip="The counter value will be incremented or decremented with this value." id="7" />
+                                                <Parameter name="Final value" inherits_from_parent="0" content_type="1" value="250" default_value="5" min="0" max="500" tooltip="It is the maximum (if increasing) or the minimum (if decreasing) value of the&#x0A;counter (thus for the last iteration).&#x0A;&#x0A;After this value, if the onStart input is called, the onReinitialized output will be&#x0A;stimulated and the counter will be reinitialized to its Initial value." id="8" />
+                                            </Box>
+                                            <Link inputowner="3" indexofinput="2" outputowner="1" indexofoutput="4" />
+                                            <Link inputowner="7" indexofinput="3" outputowner="3" indexofoutput="3" />
+                                            <Link inputowner="1" indexofinput="2" outputowner="7" indexofoutput="8" />
+                                            <Link inputowner="7" indexofinput="4" outputowner="6" indexofoutput="3" />
+                                            <Link inputowner="7" indexofinput="5" outputowner="8" indexofoutput="3" />
+                                            <Link inputowner="4" indexofinput="2" outputowner="1" indexofoutput="4" />
+                                            <Link inputowner="5" indexofinput="2" outputowner="1" indexofoutput="4" />
+                                            <Link inputowner="6" indexofinput="2" outputowner="1" indexofoutput="4" />
+                                            <Link inputowner="8" indexofinput="2" outputowner="1" indexofoutput="4" />
+                                            <Link inputowner="7" indexofinput="6" outputowner="4" indexofoutput="3" />
+                                            <Link inputowner="7" indexofinput="7" outputowner="5" indexofoutput="3" />
+                                            <Link inputowner="9" indexofinput="2" outputowner="1" indexofoutput="4" />
+                                            <Link inputowner="7" indexofinput="2" outputowner="9" indexofoutput="4" />
+                                            <Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                        </Diagram>
+                                    </BehaviorKeyframe>
+                                </BehaviorLayer>
+                                <ActuatorList />
+                            </Timeline>
+                        </Box>
+                        <Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="2" />
+                    </Diagram>
+                </BehaviorKeyframe>
+            </BehaviorLayer>
+            <ActuatorList />
+        </Timeline>
+    </Box>
+</ChoregrapheProject>
